@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from 'react'
 import ProfileContext from "../../src/ProfileContext";
 import TextField from "@material-ui/core/TextField";
 import AlternateEmailIcon from "@material-ui/icons/AlternateEmail";
@@ -91,16 +91,60 @@ export default function ProfileEditor({ toggleEditMode }) {
 
   const { userData, setUserData } = useContext(ProfileContext);
 
-  const [name, setName] = useState(userData.name);
-  const handleChangeName = (e) => setName(e.target.value);
+  const [formValues, setFormValues] = useState({
+    name: userData.name,
+    mail: userData.mail,
+    phone: userData.phone
+  });
 
-  const [mail, setMail] = useState(userData.mail);
-  const handleChangeMail = (e) => setMail(e.target.value);
+  const [formErrors, setFormErrors] = useState({
+    name: false,
+    mail: false,
+    phone: false
+  });
 
-  const [phone, setPhone] = useState(userData.phone || "");
-  const handleChangeNumber = (e) => setPhone(e.target.value);
+  const isCorrectName = useCallback((name) => {
+    //пропустит только имена в формате Иван Иванов
+    const pattern = /^([А-Я][а-яё]{1,23} [А-Я][а-яё]{1,23})$/;
 
-  const [clicked, setClicked] = useState(false);
+    return pattern.test(name);
+  }, []);
+
+  const checkFormOnErrors = () => {
+    let correct = true;
+
+    if (!isEmail(formValues.mail)) {
+      setFormErrors({ ...formErrors, mail: true });
+      correct = false;
+    }
+
+    if (!isMobilePhone(formValues.phone)) {
+      setFormErrors({ ...formErrors, phone: true });
+      correct = false;
+    }
+
+    if (!isCorrectName(formValues.name)) {
+      setFormErrors( { ...formErrors, name: true });
+      correct = false;
+    }
+
+    return correct
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+
+    //сбрасываем ошибку с текущего поля
+    setFormErrors({
+      ...formErrors,
+      [name]: false
+    });
+
+    setFormValues({
+      ...formValues,
+      [name]: value
+    })
+  };
 
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -108,8 +152,7 @@ export default function ProfileEditor({ toggleEditMode }) {
   const [error, setError] = useState(false);
 
   const handleOpenConfirmDialog = () => {
-    setClicked(true);
-    if (name !== "" && isEmail(mail) && isMobilePhone(phone)) {
+    if (checkFormOnErrors()) {
       setShowConfirmDialog(true);
     }
   };
@@ -131,8 +174,6 @@ export default function ProfileEditor({ toggleEditMode }) {
   };
 
   const handleSaveData = () => {
-    const updatedUserData = { name, mail, phone };
-
     setSaving(true);
     setError(false);
 
@@ -145,14 +186,14 @@ export default function ProfileEditor({ toggleEditMode }) {
           "Content-Type": "application/json",
         },
 
-        body: JSON.stringify(updatedUserData),
+        body: JSON.stringify(formValues),
       })
         .then((response) => response.json())
         .then((json) => {
           if (json.success) {
-            localData.save(updatedUserData);
+            localData.save(formValues);
 
-            setUserData(updatedUserData);
+            setUserData(formValues);
             setSaving(false);
 
             handleOpenInfoDialog();
@@ -171,13 +212,14 @@ export default function ProfileEditor({ toggleEditMode }) {
           <AssignmentIndIcon className={classes.icon} />
           <TextField
             className={classes.textField}
-            error={clicked && name === ""}
+            error={formErrors.name}
             label="Фамилия и имя"
             placeholder="Укажите ваши фамилию и имя"
             variant="outlined"
-            helperText={clicked && name === "" && "Вы неверно указали имя"}
-            value={name}
-            onChange={handleChangeName}
+            helperText={formErrors.name && "Вы неверно указали имя"}
+            value={formValues.name}
+            name="name"
+            onChange={handleFormChange}
             InputLabelProps={{
               shrink: true,
             }}
@@ -188,13 +230,14 @@ export default function ProfileEditor({ toggleEditMode }) {
           <AlternateEmailIcon className={classes.icon} />
           <TextField
             className={classes.textField}
-            error={clicked && !isEmail(mail)}
+            error={formErrors.mail}
             label="Email"
             placeholder="Укажите свой емайл"
-            helperText={clicked && !isEmail(mail) && "Вы неверно указали mail"}
+            helperText={formErrors.mail && "Вы неверно указали mail"}
             variant="outlined"
-            value={mail}
-            onChange={handleChangeMail}
+            value={formValues.mail}
+            name="mail"
+            onChange={handleFormChange}
             InputLabelProps={{
               shrink: true,
             }}
@@ -205,15 +248,14 @@ export default function ProfileEditor({ toggleEditMode }) {
           <PhoneIcon className={classes.icon} />
           <TextField
             className={classes.textField}
-            error={clicked && !isMobilePhone(phone)}
+            error={formErrors.phone}
             label="Номер телефона"
-            helperText={
-              clicked && !isMobilePhone(phone) && "Вы неверно указали номер"
-            }
+            helperText={formErrors.phone && "Вы неверно указали номер"}
             placeholder="Укажите номер телефона"
             variant="outlined"
-            value={phone}
-            onChange={handleChangeNumber}
+            value={formValues.phone}
+            name="phone"
+            onChange={handleFormChange}
             InputLabelProps={{
               shrink: true,
             }}
