@@ -26,7 +26,6 @@ const useStyles = makeStyles((theme) => {
 
       [theme.breakpoints.down("sm")]: {
         padding: theme.spacing(1),
-        height: 390,
       },
     },
 
@@ -80,7 +79,7 @@ const useStyles = makeStyles((theme) => {
 
       [theme.breakpoints.down("sm")]: {
         marginLeft: 0,
-        marginBottom: theme.spacing(2),
+        marginBottom: theme.spacing(1.5),
       },
     },
   };
