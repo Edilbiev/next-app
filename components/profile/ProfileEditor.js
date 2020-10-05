@@ -12,7 +12,7 @@ import InfoDialog from "../dialogs/InfoDialog";
 import isEmail from "validator/lib/isEmail";
 import isMobilePhone from "validator/lib/isMobilePhone";
 import PropTypes from "prop-types";
-import { Grid } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
 import localData from "../../src/localData";
 
 const useStyles = makeStyles((theme) => {
@@ -172,7 +172,6 @@ export default function ProfileEditor({ toggleEditMode }) {
           <TextField
             className={classes.textField}
             error={clicked && name === ""}
-            id="outlined-helperText"
             label="Фамилия и имя"
             placeholder="Укажите ваши фамилию и имя"
             variant="outlined"
@@ -190,7 +189,6 @@ export default function ProfileEditor({ toggleEditMode }) {
           <TextField
             className={classes.textField}
             error={clicked && !isEmail(mail)}
-            id="outlined-helperText"
             label="Email"
             placeholder="Укажите свой емайл"
             helperText={clicked && !isEmail(mail) && "Вы неверно указали mail"}
@@ -208,7 +206,6 @@ export default function ProfileEditor({ toggleEditMode }) {
           <TextField
             className={classes.textField}
             error={clicked && !isMobilePhone(phone)}
-            id="outlined-helperText"
             label="Номер телефона"
             helperText={
               clicked && !isMobilePhone(phone) && "Вы неверно указали номер"

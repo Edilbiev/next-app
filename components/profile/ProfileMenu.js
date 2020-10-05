@@ -4,7 +4,7 @@ import AlternateEmailIcon from "@material-ui/icons/AlternateEmail";
 import PhoneIcon from "@material-ui/icons/Phone";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core/styles";
-import { Divider } from "@material-ui/core";
+import Divider from "@material-ui/core/Divider";
 
 const useStyles = makeStyles((theme) => {
   return {
