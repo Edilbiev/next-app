@@ -9,6 +9,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundImage: "url('./Rectangle1.svg')",
     backgroundRepeat: "no-repeat",
     backgroundSize: "contain",
+    height: "100vh",
     padding: theme.spacing(2),
     [theme.breakpoints.down("xs")]: {
       padding: theme.spacing(1),
